@@ -100,6 +100,51 @@ async function addRole() {
     })
 }
 
-async function addEmployees() {
-    
+async function addEmployee() {
+    const roles = await query(`SELECT * FROM role`);
+    const employees = await query(`SELECT * FROM employee`)
+    employees.push({
+        first_name: 'No',
+        last_name: 'Manager',
+        id: null
+    })
+    inquirer.prompt([
+        {
+            name: "firstName",
+            message: "Enter the employee's first name.",
+            type: "input"
+        },
+        {
+            name: "lastName",
+            message: "Enter the employee's last name.",
+            type: "input"
+        },
+        {
+            name: "role",
+            message: "Enter the employee's role.",
+            type: "input"
+        },
+        {
+            name: "manager",
+            message: "Identify the employee's manager."
+        }
+    ])
+    .then(answer => {
+        let roleId = roles.filter(obj => {
+            return obj.title == answer.role;
+        })
+        let managerId = employees.filter(obj => {
+            if(answer.manager) return `${obj.first_name} ${obj.last_name}` == answer.manager;
+            else {
+
+            }
+        })
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answer.firstName, answer.lastName, roleId[0].id, managerId[0].id], (err, results) => {
+            if(err) console.log(err)
+            else {
+                console.log(`Added employee ${answer.firstName} ${answer.lastName} to database.`)
+                mainMenu
+            }
+        })
+    })
 }
