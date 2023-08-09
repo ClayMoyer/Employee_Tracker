@@ -148,3 +148,35 @@ async function addEmployee() {
         })
     })
 }
+async function updateEmployeeRole() {
+    const roles = await query(`SELECT * FROM role`);
+    const employees = await query(`SELECT * FROM employee`);
+    inquirer.prompt([
+        {
+            name: 'employee',
+            message: "Which employee would you like to change the role of?",
+            type: 'list',
+            choices: employees.map(obj => `${obj.first_name} ${obj.last_name}`)
+        },
+        {
+            name: 'role',
+            message: "Select the desired role.",
+            type: 'list',
+            choices: roles.map(obj => obj.title)
+        }
+    ])
+    .then(answer => {
+        let roleId = roles.filter(obj => obj.title === answer.role);
+        let employeeID = employees.filter(obj => `${obj.first_name} ${obj.last_name}` == answer.employee);
+        db.query(`
+        UPDATE employee
+        SET role_id = ?
+        WHERE id = ?`, [roleId[0].id, employeeID[0].id], (err, results) => {
+            if(err) console.log(err)
+            else {
+                console.log(`Role of ${answer.employee} updated to ${answer.role}.`);
+                mainMenu();
+            }
+        })
+    })
+}
