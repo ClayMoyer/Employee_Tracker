@@ -100,6 +100,120 @@ async function addRole() {
     })
 }
 
-async function addEmployees() {
-    
+async function addEmployee() {
+    const roles = await query(`SELECT * FROM role`);
+    const employees = await query(`SELECT * FROM employee`)
+    employees.push({
+        first_name: 'No',
+        last_name: 'Manager',
+        id: null
+    })
+    inquirer.prompt([
+        {
+            name: "firstName",
+            message: "Enter the employee's first name.",
+            type: "input"
+        },
+        {
+            name: "lastName",
+            message: "Enter the employee's last name.",
+            type: "input"
+        },
+        {
+            name: "role",
+            message: "Enter the employee's role.",
+            type: "input"
+        },
+        {
+            name: "manager",
+            message: "Identify the employee's manager."
+        }
+    ])
+    .then(answer => {
+        let roleId = roles.filter(obj => {
+            return obj.title == answer.role;
+        })
+        let managerId = employees.filter(obj => {
+            if(answer.manager) return `${obj.first_name} ${obj.last_name}` == answer.manager;
+            else {
+
+            }
+        })
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answer.firstName, answer.lastName, roleId[0].id, managerId[0].id], (err, results) => {
+            if(err) console.log(err)
+            else {
+                console.log(`Added employee ${answer.firstName} ${answer.lastName} to database.`)
+                mainMenu
+            }
+        })
+    })
 }
+async function updateEmployeeRole() {
+    const roles = await query(`SELECT * FROM role`);
+    const employees = await query(`SELECT * FROM employee`);
+    inquirer.prompt([
+        {
+            name: 'employee',
+            message: "Which employee would you like to change the role of?",
+            type: 'list',
+            choices: employees.map(obj => `${obj.first_name} ${obj.last_name}`)
+        },
+        {
+            name: 'role',
+            message: "Select the desired role.",
+            type: 'list',
+            choices: roles.map(obj => obj.title)
+        }
+    ])
+    .then(answer => {
+        let roleId = roles.filter(obj => obj.title === answer.role);
+        let employeeID = employees.filter(obj => `${obj.first_name} ${obj.last_name}` == answer.employee);
+        db.query(`
+        UPDATE employee
+        SET role_id = ?
+        WHERE id = ?`, [roleId[0].id, employeeID[0].id], (err, results) => {
+            if(err) console.log(err)
+            else {
+                console.log(`Role of ${answer.employee} updated to ${answer.role}.`);
+                mainMenu();
+            }
+        })
+    })
+}
+function mainMenu() {
+    inquirer.prompt([
+        {
+            name: 'option',
+            message: 'Select one of the following options:',
+            type: 'list',
+            choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee']
+        }
+    ])
+    .then(answer => {
+        switch(answer.option) {
+            case 'View Departments':
+                getAllDepartments();
+                break;
+            case 'View Roles':
+                getAllRoles();
+                break;
+            case 'View Employees':
+                getAllEmployees();
+                break;
+            case 'Add Department':
+                getAllDepartments();
+                break;
+            case 'Add Role':
+                addRole();
+                break;
+            case 'Add Employee':
+                addEmployee();
+                break;
+            case 'Update Employee':
+                updateEmployeeRole();
+                break;
+        }
+    })
+}
+
+mainMenu();
