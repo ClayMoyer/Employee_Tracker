@@ -33,11 +33,12 @@ function getAllRoles() {
 }
 
 function getAllEmployees() {
-    db.query(`
-    SELECT e1.id, e1.first_name, e1.last_name, role.title, role.salary, department.name AS department, CONCAT(e2.first_name, ' ', e2.last_name) AS manager
+    db.query(`SELECT role.title, role.salary, e1.id, e1.first_name, e1.last_name, department.name AS department, CONCAT(e2.first_name, " ", e2.last_name) AS manager
     FROM employee e1
     JOIN role ON e1.role_id = role.id
-    LEFT JION employee e2
+    JOIN department
+    ON role.department_id = department.id
+    LEFT JOIN employee e2
     ON e1.manager_id = e2.id`, (err, results) => {
         if (err) console.log(err)
         else {
@@ -48,7 +49,7 @@ function getAllEmployees() {
 }
 
 function addDepartment() {
-    inquirer.createPromptModule([
+    inquirer.prompt([
         {
             name: 'deptName',
             message: 'What would you like to call the department?',
@@ -68,7 +69,7 @@ function addDepartment() {
 
 async function addRole() {
     const depts = await query(`SELECT * FROM department`)
-    inquirer.createPromptModule([
+    inquirer.prompt([
         {
             name: 'title',
             message: 'Give this role a title:',
@@ -201,7 +202,7 @@ function mainMenu() {
                 getAllEmployees();
                 break;
             case 'Add Department':
-                getAllDepartments();
+                addDepartment();
                 break;
             case 'Add Role':
                 addRole();
