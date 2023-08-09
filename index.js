@@ -180,3 +180,40 @@ async function updateEmployeeRole() {
         })
     })
 }
+function mainMenu() {
+    inquirer.prompt([
+        {
+            name: 'option',
+            message: 'Select one of the following options:',
+            type: 'list',
+            choices: ['View Departments', 'View Roles', 'View Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee']
+        }
+    ])
+    .then(answer => {
+        switch(answer.option) {
+            case 'View Departments':
+                getAllDepartments();
+                break;
+            case 'View Roles':
+                getAllRoles();
+                break;
+            case 'View Employees':
+                getAllEmployees();
+                break;
+            case 'Add Department':
+                getAllDepartments();
+                break;
+            case 'Add Role':
+                addRole();
+                break;
+            case 'Add Employee':
+                addEmployee();
+                break;
+            case 'Update Employee':
+                updateEmployeeRole();
+                break;
+        }
+    })
+}
+
+mainMenu();
