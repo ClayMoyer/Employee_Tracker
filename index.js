@@ -123,11 +123,14 @@ async function addEmployee() {
         {
             name: "role",
             message: "Enter the employee's role.",
-            type: "input"
+            type: "list",
+            choices: roles.map(obj => obj.title)
         },
         {
             name: "manager",
-            message: "Identify the employee's manager."
+            message: "Identify the employee's manager.",
+            type: "list",
+            choices: employees.map(obj => `${obj.first_name} ${obj.last_name}`)
         }
     ])
     .then(answer => {
