@@ -33,5 +33,6 @@ A Content Management System for a company's employee database. Runs right in you
 
 ## Images
 
-![Application image 1](./Assets/images/startscreen.png)
+![Application image 1](https://drive.google.com/file/d/12kfr-Dd2FgHoXvHmesTMZOxL9JFa9wz4/view)
+
 
